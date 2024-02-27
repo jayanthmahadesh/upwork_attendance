@@ -2,11 +2,12 @@
 import base64
 
 from django.contrib.auth import authenticate, login
+from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_exempt
 
-from .forms import RosterForm
+from .forms import AttendanceForm, RosterForm
 from .models import AttendanceRecord, Roster
 
 
@@ -39,12 +40,12 @@ def roster_create_view(request):
             return redirect('roster_list_url')
     else:
         form = RosterForm()
-    return render(request, 'roster/roster_form.html', {'form': form})
+    return render(request, 'templates/roster_form.html', {'form': form})
 
 
 def roster_list_view(request):
     rosters = Roster.objects.all()
-    return render(request, 'roster/roster_list.html', {'rosters': rosters})
+    return render(request, 'templates/roster_list.html', {'rosters': rosters})
 
 
 def roster_update_view(request, id):
@@ -57,7 +58,7 @@ def roster_update_view(request, id):
             return redirect('roster_list_url')
     else:
         form = RosterForm(instance=roster)
-    return render(request, 'roster/roster_form.html', {'form': form})
+    return render(request, 'templates/roster_form.html', {'form': form})
 
 
 def roster_delete_view(request, id):
@@ -66,7 +67,7 @@ def roster_delete_view(request, id):
         roster.delete()
         # Redirect to the roster listing page
         return redirect('roster_list_url')
-    return render(request, 'roster/roster_confirm_delete.html', {'object': roster})
+    return render(request, 'templates/roster_confirm_delete.html', {'object': roster})
 
 
 @csrf_exempt
@@ -87,3 +88,20 @@ def capture_attendance(request):
         return JsonResponse({'status': 'success', 'message': 'Attendance captured successfully!'})
     else:
         return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
+
+
+# This view should save the attendance record with the staff member, current timestamp, and uploaded image.
+
+
+@login_required
+def mark_attendance(request):
+    if request.method == 'POST':
+        form = AttendanceForm(request.POST, request.FILES)
+        if form.is_valid():
+            attendance_record = form.save(commit=False)
+            attendance_record.staff_member = request.user
+            attendance_record.save()
+            return redirect('success_url')  # Redirect to a new URL
+    else:
+        form = AttendanceForm()
+    return render(request, 'templates/mark_attendance.html', {'form': form})
