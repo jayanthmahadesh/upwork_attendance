@@ -1,4 +1,5 @@
 # Create your views here.
+from .models import Roster
 from django.contrib.auth import authenticate, login
 from django.shortcuts import redirect, render
 
@@ -35,3 +36,8 @@ def roster_create_view(request):
     else:
         form = RosterForm()
     return render(request, 'roster/roster_form.html', {'form': form})
+
+
+def roster_list_view(request):
+    rosters = Roster.objects.all()
+    return render(request, 'roster/roster_list.html', {'rosters': rosters})
