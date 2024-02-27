@@ -3,6 +3,7 @@ import base64
 
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
+from django.core.files.base import ContentFile
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_exempt
@@ -105,3 +106,24 @@ def mark_attendance(request):
     else:
         form = AttendanceForm()
     return render(request, 'templates/mark_attendance.html', {'form': form})
+
+
+# views.py in your Django app
+
+
+@csrf_exempt
+def image_upload(request):
+    if request.method == 'POST':
+        # Extract the image data
+        image_data = request.POST.get('image_data')
+        format, imgstr = image_data.split(';base64,')
+        ext = format.split('/')[-1]
+
+        # Convert base64 to an image file
+        image_file = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)
+
+        # Here, you can now handle the image file as needed, e.g., saving it to a model
+
+        return JsonResponse({'status': 'success', 'message': 'Image received'})
+
+    return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
