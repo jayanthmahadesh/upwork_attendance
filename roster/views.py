@@ -1,9 +1,9 @@
 # Create your views here.
-from .models import Roster
 from django.contrib.auth import authenticate, login
 from django.shortcuts import redirect, render
 
 from .forms import RosterForm
+from .models import Roster
 
 
 def custom_login(request):
@@ -41,3 +41,25 @@ def roster_create_view(request):
 def roster_list_view(request):
     rosters = Roster.objects.all()
     return render(request, 'roster/roster_list.html', {'rosters': rosters})
+
+
+def roster_update_view(request, id):
+    roster = Roster.objects.get(id=id)
+    if request.method == 'POST':
+        form = RosterForm(request.POST, instance=roster)
+        if form.is_valid():
+            form.save()
+            # Redirect to the roster listing page
+            return redirect('roster_list_url')
+    else:
+        form = RosterForm(instance=roster)
+    return render(request, 'roster/roster_form.html', {'form': form})
+
+
+def roster_delete_view(request, id):
+    roster = Roster.objects.get(id=id)
+    if request.method == 'POST':
+        roster.delete()
+        # Redirect to the roster listing page
+        return redirect('roster_list_url')
+    return render(request, 'roster/roster_confirm_delete.html', {'object': roster})
