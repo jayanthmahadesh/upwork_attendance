@@ -47,3 +47,12 @@ class AttendanceRecord(models.Model):
 
     def __str__(self):
         return f"Attendance for {self.staff_member.name} on {self.timestamp.strftime('%Y-%m-%d %H:%M')}"
+
+
+class AttendanceRecord(models.Model):
+    staff_member = models.ForeignKey(User, on_delete=models.CASCADE)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    image = models.ImageField(upload_to='attendance_images/')
+
+    def __str__(self):
+        return f'{self.staff_member.username} - {self.timestamp}'
