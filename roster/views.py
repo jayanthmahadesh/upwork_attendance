@@ -11,6 +11,7 @@ def custom_login(request):
         if user is not None:
             login(request, user)
             # Redirect to a success page.
+            # will define this /success_url in couple of minutes
             return redirect('/success-url/')
         else:
             # Return an 'invalid login' error message.
