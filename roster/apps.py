@@ -1,5 +1,5 @@
-from django.contrib.auth.models import Group
-from django.db import migrations
+# from django.contrib.auth.models import Group
+# from django.db import migrations
 from django.apps import AppConfig
 
 
@@ -8,17 +8,17 @@ class RosterConfig(AppConfig):
     name = 'roster'
 
 
-def create_groups(apps, schema_editor):
-    Group.objects.get_or_create(name='Manager')
-    Group.objects.get_or_create(name='Staff')
+# def create_groups(apps, schema_editor):
+#     Group.objects.get_or_create(name='Manager')
+#     Group.objects.get_or_create(name='Staff')
 
 
-class Migration(migrations.Migration):
+# class Migration(migrations.Migration):
 
-    dependencies = [
-        ('roster', '0001_initial'),
-    ]
+#     dependencies = [
+#         ('roster', '0001_initial'),
+#     ]
 
-    operations = [
-        migrations.RunPython(create_groups),
-    ]
+#     operations = [
+#         migrations.RunPython(create_groups),
+#     ]

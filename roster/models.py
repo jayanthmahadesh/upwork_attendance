@@ -8,7 +8,6 @@ class StaffMember(models.Model):
     # Linking each staff member to Django's built-in User model for authentication and extending it
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     # Additional fields
-    name = models.CharField(max_length=100)
     email = models.EmailField(max_length=100)
     ROLE_CHOICES = (
         ('Manager', 'Manager'),
@@ -17,11 +16,9 @@ class StaffMember(models.Model):
     role = models.CharField(max_length=10, choices=ROLE_CHOICES)
 
     def __str__(self):
-        return self.name
+        return self.user.username
 
 # Roster model
-
-
 class Roster(models.Model):
     staff_member = models.ForeignKey(StaffMember, on_delete=models.CASCADE)
     # Example: "Monday, Wednesday, Friday"
@@ -34,25 +31,23 @@ class Roster(models.Model):
     shifts = models.CharField(max_length=10, choices=SHIFT_CHOICES)
 
     def __str__(self):
-        return f"{self.staff_member.name}'s Roster"
+        return f"{self.staff_member.user.username}'s Roster"
 
 # AttendanceRecord model
+# class AttendanceRecord(models.Model):
+#     staff_member = models.ForeignKey(StaffMember, on_delete=models.CASCADE)
+#     timestamp = models.DateTimeField(default=timezone.now)
+#     # Assuming media is configured
+#     image = models.ImageField(upload_to='attendance_images/')
+
+#     def __str__(self):
+#         return f"Attendance for {self.staff_member.name} on {self.timestamp.strftime('%Y-%m-%d %H:%M')}"
 
 
-class AttendanceRecord(models.Model):
-    staff_member = models.ForeignKey(StaffMember, on_delete=models.CASCADE)
-    timestamp = models.DateTimeField(default=timezone.now)
-    # Assuming media is configured
-    image = models.ImageField(upload_to='attendance_images/')
+# class AttendanceRecord(models.Model):
+#     staff_member = models.ForeignKey(User, on_delete=models.CASCADE)
+#     timestamp = models.DateTimeField(auto_now_add=True)
+#     image = models.ImageField(upload_to='attendance_images/')
 
-    def __str__(self):
-        return f"Attendance for {self.staff_member.name} on {self.timestamp.strftime('%Y-%m-%d %H:%M')}"
-
-
-class AttendanceRecord(models.Model):
-    staff_member = models.ForeignKey(User, on_delete=models.CASCADE)
-    timestamp = models.DateTimeField(auto_now_add=True)
-    image = models.ImageField(upload_to='attendance_images/')
-
-    def __str__(self):
-        return f'{self.staff_member.username} - {self.timestamp}'
+#     def __str__(self):
+#         return f'{self.staff_member.username} - {self.timestamp}'
