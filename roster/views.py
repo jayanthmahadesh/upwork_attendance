@@ -1,9 +1,13 @@
 # Create your views here.
+import base64
+
 from django.contrib.auth import authenticate, login
+from django.http import JsonResponse
 from django.shortcuts import redirect, render
+from django.views.decorators.csrf import csrf_exempt
 
 from .forms import RosterForm
-from .models import Roster
+from .models import AttendanceRecord, Roster
 
 
 def custom_login(request):
@@ -63,3 +67,23 @@ def roster_delete_view(request, id):
         # Redirect to the roster listing page
         return redirect('roster_list_url')
     return render(request, 'roster/roster_confirm_delete.html', {'object': roster})
+
+
+@csrf_exempt
+def capture_attendance(request):
+    if request.method == 'POST':
+        image_data = request.POST.get('image')
+        timestamp = request.POST.get('timestamp')
+
+        # Decode the image data and save it to a file or directly to a model field
+        format, imgstr = image_data.split(';base64,')
+        ext = format.split('/')[-1]
+
+        # You can save the image file here and/or process it as needed
+        # For example, saving the data to AttendanceRecord model
+        record = AttendanceRecord(image=imgstr, timestamp=timestamp)
+        record.save()
+
+        return JsonResponse({'status': 'success', 'message': 'Attendance captured successfully!'})
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
