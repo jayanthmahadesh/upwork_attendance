@@ -1,15 +1,14 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Capture Attendance</title>
-</head>
-<body>
-    <video id="webcam" autoplay playsinline width="640" height="480"></video>
-    <button id="capture">Capture Photo</button>
-    <canvas id="canvas" width="640" height="480" style="display:none;"></canvas>
 
-    <!-- Include jQuery for AJAX (optional) -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="{% static 'js/capture.js' %}"></script>
-</body>
-</html>
+
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Mark Attendance</h2>
+    <video id="webcam" width="640" height="480" autoplay></video>
+    <canvas id="canvas" width="640" height="480" style="display:none;"></canvas>
+    <button id="capture" class="btn btn-primary mt-3">Capture Image</button>
+</div>
+
+<script src="{% static 'js/capture.js' %}"></script>
+{% endblock %}

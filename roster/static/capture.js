@@ -1,40 +1,44 @@
-document.addEventListener('DOMContentLoaded', function () {
-    var video = document.querySelector('#webcam');
-    var captureButton = document.getElementById('capture');
-    var canvas = document.getElementById('canvas');
-    var context = canvas.getContext('2d');
+// capture.js
+document.addEventListener("DOMContentLoaded", function () {
+    const video = document.getElementById('webcam');
+    const canvas = document.getElementById('canvas');
+    const context = canvas.getContext('2d');
+    const captureButton = document.getElementById('capture');
 
-    // Request access to the webcam
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        navigator.mediaDevices.getUserMedia({ video: true }).then(function (stream) {
-            video.srcObject = stream;
-            video.play();
-        });
+    // Access the webcam
+    if (navigator.mediaDevices.getUserMedia) {
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(function (stream) {
+                video.srcObject = stream;
+            })
+            .catch(function (err) {
+                console.log("Something went wrong!", err);
+            });
     }
 
-    // Capture the photo on button click
+    // Capture the image and send data
     captureButton.addEventListener('click', function () {
-        context.drawImage(video, 0, 0, 640, 480); // Draw the video frame to the canvas
-        var imageDataURL = canvas.toDataURL('image/png'); // Get image data as a URL
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-        // Get current timestamp
-        var timestamp = new Date().toISOString();
+        // Convert canvas image to data URL (base64)
+        const imageDataUrl = canvas.toDataURL('image/png');
 
-        // Send the image data and timestamp to the server using AJAX
+        // Send the image data to Django backend using AJAX
         $.ajax({
             type: "POST",
-            url: "/capture_attendance/", // URL to Django view handling the post
+            url: "/your-endpoint-url/", // Update this URL to your Django view endpoint
             data: {
-                image: imageDataURL,
-                timestamp: timestamp,
-                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val() // Handle CSRF token
+                image_data: imageDataUrl,
+                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(), // Handle CSRF token
             },
             success: function (response) {
-                alert("Attendance captured successfully!");
+                // Handle success
+                console.log("Image sent successfully!");
+                console.log(response); // You can do something with the response
             },
             error: function (error) {
-                console.log(error);
-                alert("Error capturing attendance.");
+                // Handle error
+                console.log("Error sending image:", error);
             }
         });
     });
