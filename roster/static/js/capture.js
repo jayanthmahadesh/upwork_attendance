@@ -28,7 +28,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // Send the image data to Django backend using AJAX
         $.ajax({
             type: "POST",
-            url: "/image_upload/", // Update this URL to your Django view endpoint
+            url: "/img/images/", // Update this URL to your Django view endpoint
             data: {
                 image_data: imageDataUrl,
                 csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(), // Handle CSRF token

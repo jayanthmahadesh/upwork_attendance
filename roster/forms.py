@@ -13,6 +13,7 @@ class RosterForm(forms.ModelForm):
 # This form is linked to the AttendanceRecord model and
 # will only display an input for the image, as the other
 # fields (staff_member and timestamp) will be automatically filled.
+
 class AttendanceForm(forms.ModelForm):
     class Meta:
         model = AttendanceRecord

@@ -127,3 +127,8 @@ def image_upload(request):
         return JsonResponse({'status': 'success', 'message': 'Image received'})
 
     return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
+
+
+def attendance_system(request):
+    return render(request, 'attendance_system.html')
+# views.py in your Django app
