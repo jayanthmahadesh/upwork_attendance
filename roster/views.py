@@ -2,6 +2,8 @@
 from django.contrib.auth import authenticate, login
 from django.shortcuts import redirect, render
 
+from .forms import RosterForm
+
 
 def custom_login(request):
     if request.method == "POST":
@@ -18,3 +20,18 @@ def custom_login(request):
             return render(request, 'login.html', {'error': 'Invalid username or password'})
     else:
         return render(request, 'login.html')
+
+
+# views.py
+
+
+def roster_create_view(request):
+    if request.method == 'POST':
+        form = RosterForm(request.POST)
+        if form.is_valid():
+            form.save()
+            # Redirect to the roster listing page
+            return redirect('roster_list_url')
+    else:
+        form = RosterForm()
+    return render(request, 'roster/roster_form.html', {'form': form})
