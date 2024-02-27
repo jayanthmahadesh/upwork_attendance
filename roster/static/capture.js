@@ -1,4 +1,6 @@
 // capture.js
+
+// This setup captures the image from the webcam, converts it to a base64 encoded data URL, and sends it to the Django backend using AJAX. The Django view receives this data, decodes it, and converts it back into an image file, which can then be processed or stored as needed.
 document.addEventListener("DOMContentLoaded", function () {
     const video = document.getElementById('webcam');
     const canvas = document.getElementById('canvas');
@@ -26,7 +28,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // Send the image data to Django backend using AJAX
         $.ajax({
             type: "POST",
-            url: "/your-endpoint-url/", // Update this URL to your Django view endpoint
+            url: "/image_upload/", // Update this URL to your Django view endpoint
             data: {
                 image_data: imageDataUrl,
                 csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(), // Handle CSRF token
