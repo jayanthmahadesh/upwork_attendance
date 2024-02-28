@@ -1,8 +1,7 @@
 
 from django import forms
 
-# from .models import AttendanceRecord, Roster
-from .models import Roster
+from .models import AttendanceRecord, Roster
 
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
@@ -22,10 +21,10 @@ class LoginForm(forms.ModelForm):
 # will only display an input for the image, as the other
 # fields (staff_member and timestamp) will be automatically filled.
 
-# class AttendanceForm(forms.ModelForm):
-#     class Meta:
-#         model = AttendanceRecord
-#         fields = ['image']
+class AttendanceForm(forms.ModelForm):
+    class Meta:
+        model = AttendanceRecord
+        fields = ['image']
         
 class UserRegistrationForm(UserCreationForm):
     email = forms.EmailField(required=True)

@@ -8,10 +8,9 @@ from django.http import JsonResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_exempt
 
-# from .forms import AttendanceForm, RosterForm
+from .forms import AttendanceForm
 from .forms import UserRegistrationForm, StaffMemberForm,RosterForm,LoginForm
-# from .models import AttendanceRecord, Roster
-from .models import StaffMember,Roster
+from .models import StaffMember,Roster,AttendanceRecord
 def homepage(request):
     return render(request,'homepage.html')
 def register(request):
@@ -53,9 +52,8 @@ def custom_login(request):
 
 def custom_logout(request):
     logout(request)  # Log the user out
-    del request.session['user_id'] 
-    del request.session['user_name'] 
-    return redirect('login')
+    request.session.flush()
+    return redirect('custom_login')
 # views.py
 
 def roster_create_view(request):
@@ -118,63 +116,88 @@ def roster_delete_view(request, id):
     return render(request, 'manager/roster_confirm_delete.html', {'object': roster})
 
 
-# @csrf_exempt
-# def capture_attendance(request):
-#     if request.method == 'POST':
-#         image_data = request.POST.get('image')
-#         timestamp = request.POST.get('timestamp')
+@csrf_exempt
+def capture_attendance(request):
+    if request.method == 'POST':
+        image_data = request.POST.get('image')
 
-#         # Decode the image data and save it to a file or directly to a model field
-#         format, imgstr = image_data.split(';base64,')
-#         ext = format.split('/')[-1]
+        # Decode the image data and save it to a file or directly to a model field
+        format, imgstr = image_data.split(';base64,')
+        ext = format.split('/')[-1]
 
-#         # You can save the image file here and/or process it as needed
-#         # For example, saving the data to AttendanceRecord model
-#         record = AttendanceRecord(image=imgstr, timestamp=timestamp)
-#         record.save()
-
-#         return JsonResponse({'status': 'success', 'message': 'Attendance captured successfully!'})
-#     else:
-#         return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
-
-
+        # You can save the image file here and/or process it as needed
+        # For example, saving the data to AttendanceRecord model
+        form = AttendanceRecord(image=imgstr)
+        staff_member_id = request.session.get('user_id')
+        staff_member = StaffMember.objects.get(pk=staff_member_id)
+        record = form.save(commit=False)
+        record.staff_member = staff_member
+        record.save()
+        return redirect('register_success')
+    else:
+        return render(request, 'capture_attendance.html', {'form': form})
+    if request.method == 'POST':
+        form = RosterForm(request.POST)
+        if form.is_valid():
+            staff_member_id = request.session.get('user_id')
+            try:
+                staff_member = StaffMember.objects.get(pk=staff_member_id)
+            except StaffMember.DoesNotExist:
+                # Handle the case where the staff member is not found
+                print("something unwanted happened")
+                return render(request, 'manager/roster_form.html', {'form': form, 'error_message': 'Staff member not found'})
+            
+            roster = form.save(commit=False)
+            roster.staff_member = staff_member
+            roster.save()
+            return redirect('register_success')
+    else:
+        form = RosterForm()
+    return render(request, 'manager/roster_form.html', {'form': form})
 # # This view should save the attendance record with the staff member, current timestamp, and uploaded image.
 
 
-# @login_required
-# def mark_attendance(request):
-#     if request.method == 'POST':
-#         form = AttendanceForm(request.POST, request.FILES)
-#         if form.is_valid():
-#             attendance_record = form.save(commit=False)
-#             attendance_record.staff_member = request.user
-#             attendance_record.save()
-#             return redirect('success_url')  # Redirect to a new URL
-#     else:
-#         form = AttendanceForm()
-#     return render(request, 'templates/mark_attendance.html', {'form': form})
+def mark_attendance(request):
+    if request.method == 'POST':
+        form = AttendanceForm(request.POST, request.FILES)  
+        if form.is_valid():
+            staff_member_id = request.session.get('user_id')
+            try:
+                staff_member = StaffMember.objects.get(pk=staff_member_id)
+            except StaffMember.DoesNotExist:
+                # Handle the case where the staff member is not found
+                print("something unwanted happened")
+                return render(request, 'manager/roster_form.html', {'form': form, 'error_message': 'Staff member not found'})
+            
+            roster = form.save(commit=False)
+            roster.staff_member = staff_member
+            roster.save()
+            return redirect('register_success')  # Redirect to a new URL
+
+    else:
+        form = AttendanceForm()
+    return render(request, 'manager/mark_attendance.html', {'form': form})
 
 
 # # views.py in your Django app
 
 
-# @csrf_exempt
-# def image_upload(request):
-#     if request.method == 'POST':
-#         # Extract the image data
-#         image_data = request.POST.get('image_data')
-#         format, imgstr = image_data.split(';base64,')
-#         ext = format.split('/')[-1]
+@csrf_exempt
+def image_upload(request):
+    if request.method == 'POST':
+        # Extract the image data
+        image_data = request.POST.get('image_data')
+        format, imgstr = image_data.split(';base64,')
+        ext = format.split('/')[-1]
 
-#         # Convert base64 to an image file
-#         image_file = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)
+        # Convert base64 to an image file
+        image_file = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)
 
-#         # Here, you can now handle the image file as needed, e.g., saving it to a model
+        # Here, you can now handle the image file as needed, e.g., saving it to a model
 
-#         return JsonResponse({'status': 'success', 'message': 'Image received'})
+        return JsonResponse({'status': 'success', 'message': 'Image received'})
 
-#     return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
-
+    return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
 
 # def attendance_system(request):
 #     return render(request, 'attendance_system.html')

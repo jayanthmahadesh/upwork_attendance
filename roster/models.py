@@ -34,14 +34,14 @@ class Roster(models.Model):
         return f"{self.staff_member.user.username}'s Roster"
 
 # AttendanceRecord model
-# class AttendanceRecord(models.Model):
-#     staff_member = models.ForeignKey(StaffMember, on_delete=models.CASCADE)
-#     timestamp = models.DateTimeField(default=timezone.now)
-#     # Assuming media is configured
-#     image = models.ImageField(upload_to='attendance_images/')
+class AttendanceRecord(models.Model):
+    staff_member = models.ForeignKey(StaffMember, on_delete=models.CASCADE)
+    timestamp = models.DateTimeField(default=timezone.now)
+    # Assuming media is configured
+    image = models.ImageField(upload_to='images')
 
-#     def __str__(self):
-#         return f"Attendance for {self.staff_member.name} on {self.timestamp.strftime('%Y-%m-%d %H:%M')}"
+    def __str__(self):
+        return f"Attendance for {self.staff_member.user.username} on {self.timestamp.strftime('%Y-%m-%d %H:%M')}"
 
 
 # class AttendanceRecord(models.Model):

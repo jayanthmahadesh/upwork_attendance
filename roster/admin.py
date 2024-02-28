@@ -6,3 +6,5 @@ from .models import *
 # admin.site.register(CaseList)
 admin.site.register(StaffMember)
 admin.site.register(Roster)
+admin.site.register(AttendanceRecord)
+# admin.site.register(User)
