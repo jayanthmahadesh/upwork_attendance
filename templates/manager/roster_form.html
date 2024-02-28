@@ -1,25 +1,21 @@
-{% extends 'base.html' %}
-
-{% block content %}
+{% extends 'base.html' %} {% block content %}
 <div class="container mt-4">
-    <h2>Roster Form</h2>
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        <div class="form-group">
-            <label for="staff_member">Staff Member:</label>
-            {{ form.staff_member }}
-        </div>
-        <div class="form-group">
-            <label for="working_days">Working Days:</label>
-            {{ form.working_days }}
-            <small class="form-text text-muted">Select the days the staff member is expected to work.</small>
-        </div>
-        <div class="form-group">
-            <label for="shifts">Shifts:</label>
-            {{ form.shifts }}
-            <small class="form-text text-muted">Specify the shift timings.</small>
-        </div>
-        <button type="submit" class="btn btn-primary">Submit</button>
-    </form>
+  <h2>Roster Form</h2>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="form-group">
+      <label for="working_days">Working Days:</label>
+      {{ form.working_days }}
+      <small class="form-text text-muted"
+        >Select the days the staff member is expected to work.</small
+      >
+    </div>
+    <div class="form-group">
+      <label for="shifts">Shifts:</label>
+      {{ form.shifts }}
+      <small class="form-text text-muted">Specify the shift timings.</small>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
 </div>
 {% endblock %}

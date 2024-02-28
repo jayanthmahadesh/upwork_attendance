@@ -11,8 +11,12 @@ from .models import StaffMember
 class RosterForm(forms.ModelForm):
     class Meta:
         model = Roster
-        fields = ['staff_member', 'working_days', 'shifts']
+        fields = ['working_days', 'shifts']
 
+class LoginForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['username', 'password']
 
 # This form is linked to the AttendanceRecord model and
 # will only display an input for the image, as the other
