@@ -18,13 +18,13 @@
   const imageDataInput = document.getElementById("image_data");
   console.log("zero");
   // Access webcam
-
   navigator.mediaDevices
-.getUserMedia({ video: true })
-.then((stream) => {video.srcObject = stream;
-  video.play();
- })
- .catch((error) => console.error("Error accessing camera:", error));
+    .getUserMedia({ video: true })
+    .then((stream) => {
+      video.srcObject = stream;
+      video.play();
+    })
+    .catch((error) => console.error("Error accessing camera:", error));
   console.log("one");
   // Capture image
   captureButton.addEventListener("click", () => {

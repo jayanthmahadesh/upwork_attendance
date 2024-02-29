@@ -8,13 +8,19 @@ from django.core.files.base import ContentFile
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_exempt
-
-from .forms import AttendanceForm
-from .forms import UserRegistrationForm, StaffMemberForm,RosterForm,LoginForm
+from .forms import UserRegistrationForm, StaffMemberForm,RosterForm,LoginForm,AttendanceForm
 from .models import StaffMember,Roster,AttendanceRecord
+
 def homepage(request):
     return render(request,'homepage.html')
+
 def register(request):
+    # type_of_user = request.session.get('user_type')
+    # if(type_of_user=="Staff"):
+    #     return redirect('no_access')
+    access=check_user_access(request)
+    if(access):
+        return redirect('no_access')
     if request.method == 'POST':
         user_form = UserRegistrationForm(request.POST)
         member_form = StaffMemberForm(request.POST)
@@ -43,6 +49,7 @@ def custom_login(request):
             print("the primary key of the object"+str(staff_member.pk))
             request.session['user_id'] = staff_member.pk
             request.session['user_name'] = staff_member.user.username 
+            request.session['user_type']=staff_member.role
             return redirect('register_success')
         else:
             print("user is not registered or the password is incorrect")
@@ -56,19 +63,6 @@ def custom_logout(request):
     request.session.flush()
     return redirect('custom_login')
 # views.py
-
-def roster_create_view(request):
-    if request.method == 'POST':
-        form = RosterForm(request.POST)
-        if form.is_valid():
-            form.save()
-            # Redirect to the roster listing page
-            return redirect('manager/roster_list_url')
-    else:
-        form = RosterForm()
-    return render(request, 'manager/roster_form.html', {'form': form})
-def register_success_view(request):
-    return render(request, 'success.html') 
 @login_required
 def create_roster(request):
     if request.method == 'POST':
@@ -90,12 +84,17 @@ def create_roster(request):
         form = RosterForm()
     return render(request, 'manager/roster_form.html', {'form': form})
 def roster_list(request):
+    access=check_user_access(request)
+    if(access):
+        return redirect('no_access')
     rosters = Roster.objects.all()
-    print(rosters)
     return render(request, 'manager/roster_list.html', {'rosters': rosters})
 
 
 def roster_update_view(request, id):
+    access=check_user_access(request)
+    if(access):
+        return redirect('no_access')
     roster = Roster.objects.get(id=id)
     if request.method == 'POST':
         form = RosterForm(request.POST, instance=roster)
@@ -109,6 +108,9 @@ def roster_update_view(request, id):
 
 
 def roster_delete_view(request, id):
+    access=check_user_access(request)
+    if(access):
+        return redirect('no_access')
     roster = Roster.objects.get(id=id)
     if request.method == 'POST':
         roster.delete()
@@ -138,3 +140,21 @@ def mark_attendance(request):
     else:
         form = AttendanceForm()
     return render(request, 'manager/mark_attendance.html')
+
+
+
+
+def register_success_view(request):
+    return render(request, 'success.html') 
+
+
+
+def no_access(request):
+    return render(request, 'no_access.html') 
+
+
+def check_user_access(request):
+    type_of_user = request.session.get('user_type')
+    if(type_of_user=="Manager"):
+        return False
+    return True
