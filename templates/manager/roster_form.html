@@ -15,6 +15,16 @@
       {{ form.shifts }}
       <small class="form-text text-muted">Specify the shift timings.</small>
     </div>
+    <div class="form-group">
+      <label for="shifts">Staff name:</label>
+      <select id="staff-select" name="username">
+        {% for name in staff_list %}
+        <option value="{{ name }}">{{ name }}</option>
+        {% endfor %}
+      </select>
+      <small class="form-text text-muted">select the staff name.</small>
+    </div>
+
     <button type="submit" class="btn btn-primary">Submit</button>
   </form>
 </div>

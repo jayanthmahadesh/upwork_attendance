@@ -63,26 +63,31 @@ def custom_logout(request):
     request.session.flush()
     return redirect('custom_login')
 # views.py
-@login_required
 def create_roster(request):
+    access=check_user_access(request)
+    if(access):
+        return redirect('no_access')
     if request.method == 'POST':
         form = RosterForm(request.POST)
+        username = request.POST.get('username')
         if form.is_valid():
-            staff_member_id = request.session.get('user_id')
             try:
-                staff_member = StaffMember.objects.get(pk=staff_member_id)
+                staff_member = StaffMember.objects.get(user__username=username)
             except StaffMember.DoesNotExist:
                 # Handle the case where the staff member is not found
                 print("something unwanted happened")
                 return render(request, 'manager/roster_form.html', {'form': form, 'error_message': 'Staff member not found'})
-            
             roster = form.save(commit=False)
             roster.staff_member = staff_member
             roster.save()
             return redirect('register_success')
     else:
         form = RosterForm()
-    return render(request, 'manager/roster_form.html', {'form': form})
+    temp = StaffMember.objects.filter()
+    staff_list=[]
+    for i in temp:
+        staff_list.append(i.user.username)
+    return render(request, 'manager/roster_form.html', {'form': form,'staff_list':staff_list})
 def roster_list(request):
     access=check_user_access(request)
     if(access):
@@ -117,7 +122,7 @@ def roster_delete_view(request, id):
         # Redirect to the roster listing page
         return redirect('roster_list_url')
     return render(request, 'manager/roster_confirm_delete.html', {'object': roster})
-
+@login_required
 def mark_attendance(request):
     if request.method == 'POST':
         image_data = request.POST.get('image_data')
