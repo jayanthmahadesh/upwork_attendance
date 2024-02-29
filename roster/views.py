@@ -18,9 +18,9 @@ def register(request):
     # type_of_user = request.session.get('user_type')
     # if(type_of_user=="Staff"):
     #     return redirect('no_access')
-    access=check_user_access(request)
-    if(access):
-        return redirect('no_access')
+    # access=check_user_access(request)
+    # if(access):
+    #     return redirect('no_access')
     if request.method == 'POST':
         user_form = UserRegistrationForm(request.POST)
         member_form = StaffMemberForm(request.POST)
