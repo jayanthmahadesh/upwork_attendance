@@ -1,7 +1,6 @@
 {% extends 'base.html' %} {% block content %}
 <form method="post" enctype="multipart/form-data">
-  {% csrf_token %}
-
+  {% csrf_token %} asdf
   <video id="video" autoplay width="300" height="200"></video>
   <button id="capture">Take Photo</button>
   <canvas id="canvas" width="300" height="200" style="display: none"></canvas>
@@ -17,13 +16,16 @@
   const canvas = document.getElementById("canvas");
   const captureButton = document.getElementById("capture");
   const imageDataInput = document.getElementById("image_data");
-
+  console.log("zero");
   // Access webcam
-  navigator.mediaDevices
-    .getUserMedia({ video: true })
-    .then((stream) => (video.srcObject = stream))
-    .catch(console.error);
 
+  navigator.mediaDevices
+.getUserMedia({ video: true })
+.then((stream) => {video.srcObject = stream;
+  video.play();
+ })
+ .catch((error) => console.error("Error accessing camera:", error));
+  console.log("one");
   // Capture image
   captureButton.addEventListener("click", () => {
     const context = canvas.getContext("2d");

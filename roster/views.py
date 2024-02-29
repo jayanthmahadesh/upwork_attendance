@@ -1,5 +1,6 @@
 # Create your views here.
 import base64
+import uuid  
 
 from django.contrib.auth import authenticate, login,logout
 from django.contrib.auth.decorators import login_required
@@ -115,90 +116,25 @@ def roster_delete_view(request, id):
         return redirect('roster_list_url')
     return render(request, 'manager/roster_confirm_delete.html', {'object': roster})
 
-
-@csrf_exempt
-def capture_attendance(request):
-    if request.method == 'POST':
-        image_data = request.POST.get('image')
-
-        # Decode the image data and save it to a file or directly to a model field
-        format, imgstr = image_data.split(';base64,')
-        ext = format.split('/')[-1]
-
-        # You can save the image file here and/or process it as needed
-        # For example, saving the data to AttendanceRecord model
-        form = AttendanceRecord(image=imgstr)
-        staff_member_id = request.session.get('user_id')
-        staff_member = StaffMember.objects.get(pk=staff_member_id)
-        record = form.save(commit=False)
-        record.staff_member = staff_member
-        record.save()
-        return redirect('register_success')
-    else:
-        return render(request, 'capture_attendance.html', {'form': form})
-    if request.method == 'POST':
-        form = RosterForm(request.POST)
-        if form.is_valid():
-            staff_member_id = request.session.get('user_id')
-            try:
-                staff_member = StaffMember.objects.get(pk=staff_member_id)
-            except StaffMember.DoesNotExist:
-                # Handle the case where the staff member is not found
-                print("something unwanted happened")
-                return render(request, 'manager/roster_form.html', {'form': form, 'error_message': 'Staff member not found'})
-            
-            roster = form.save(commit=False)
-            roster.staff_member = staff_member
-            roster.save()
-            return redirect('register_success')
-    else:
-        form = RosterForm()
-    return render(request, 'manager/roster_form.html', {'form': form})
-# # This view should save the attendance record with the staff member, current timestamp, and uploaded image.
-
-
 def mark_attendance(request):
     if request.method == 'POST':
-        form = AttendanceForm(request.POST, request.FILES)  
-        if form.is_valid():
-            staff_member_id = request.session.get('user_id')
-            try:
-                staff_member = StaffMember.objects.get(pk=staff_member_id)
-            except StaffMember.DoesNotExist:
-                # Handle the case where the staff member is not found
-                print("something unwanted happened")
-                return render(request, 'manager/roster_form.html', {'form': form, 'error_message': 'Staff member not found'})
-            
-            roster = form.save(commit=False)
-            roster.staff_member = staff_member
-            roster.save()
-            return redirect('register_success')  # Redirect to a new URL
+        image_data = request.POST.get('image_data')
+        # Decode base64 data
+        format, imgstr = image_data.split(';base64,') 
+        ext = format.split('/')[-1] 
+        data = ContentFile(base64.b64decode(imgstr), name=uuid.uuid4().hex + '.' + ext)
 
+        # Save to model
+        image_instance = AttendanceRecord(image=data)
+        staff_member_id = request.session.get('user_id')
+        try:
+            staff_member = StaffMember.objects.get(pk=staff_member_id)
+        except StaffMember.DoesNotExist:
+            print("something unwanted happened")
+            return render(request, 'login.html')
+        image_instance.staff_member = staff_member
+        image_instance.save()
+        return redirect('register_success')  # Redirect to a new URL
     else:
         form = AttendanceForm()
-    return render(request, 'manager/mark_attendance.html', {'form': form})
-
-
-# # views.py in your Django app
-
-
-@csrf_exempt
-def image_upload(request):
-    if request.method == 'POST':
-        # Extract the image data
-        image_data = request.POST.get('image_data')
-        format, imgstr = image_data.split(';base64,')
-        ext = format.split('/')[-1]
-
-        # Convert base64 to an image file
-        image_file = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)
-
-        # Here, you can now handle the image file as needed, e.g., saving it to a model
-
-        return JsonResponse({'status': 'success', 'message': 'Image received'})
-
-    return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
-
-# def attendance_system(request):
-#     return render(request, 'attendance_system.html')
-# # views.py in your Django app
+    return render(request, 'manager/mark_attendance.html')
