@@ -1,12 +1,12 @@
-{% extends 'base.html' %} {% block content %}
+{% extends 'base.html' %} {% block content %} {% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'attendance.css' %}" />
+<h2>Mark Your attendance</h2>
 <form method="post" enctype="multipart/form-data">
-  {% csrf_token %} 
+  {% csrf_token %}
   <video id="video" autoplay width="300" height="200"></video>
   <button id="capture">Take Photo</button>
   <canvas id="canvas" width="300" height="200" style="display: none"></canvas>
   <input type="hidden" name="image_data" id="image_data" />
-
-  <button type="submit">Upload</button>
 </form>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>

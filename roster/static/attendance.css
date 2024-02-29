@@ -1,0 +1,34 @@
+/* General container styling */
+form {
+    display: flex;             /* Arrange items in a row */
+    flex-direction: column;    /* Stack items vertically */
+    align-items: center;       /* Center the elements */
+    gap: 15px;                 /* Space between elements */
+    padding: 20px;
+    border: 1px solid #ccc;    /* Subtle border */
+    border-radius: 5px;        /* Soften the corners */
+  }
+  
+  /* Style the video and canvas area */
+  #video, 
+  #canvas {
+    border: 1px solid #ccc; 
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2); /* Subtle shadow effect */
+  }
+  
+  /* Button styling */
+  #capture {
+    background-color: #4CAF50; /* Green background */
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s; /* Smooth hover effect */
+  }
+  
+  /* Hover effect on button */
+  #capture:hover {
+    background-color: #45a049;  /* Darker green on hover */
+  }
+  
