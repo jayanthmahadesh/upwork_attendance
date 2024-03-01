@@ -65,3 +65,27 @@ a:hover {
 label{
     margin-top: 15px;
 }
+
+/* styling of attendace for each user */
+/* Style for the overall container */
+table {
+    border-collapse: collapse; 
+    width: 80%; /* Adjust width as needed */
+    margin: 20px auto; /* Centers the table */
+  }
+  
+  th, td {
+    border: 1px solid #ddd;
+    text-align: left;
+    padding: 8px;
+  }
+  
+  /* Optional: Style the table header */
+  th {
+    background-color: #f2f2f2; 
+  }
+  
+table img { 
+    max-width: 100px; /* Limit image width inside the table cell */
+    height: auto;     
+  }

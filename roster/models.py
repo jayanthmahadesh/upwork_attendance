@@ -20,7 +20,7 @@ class StaffMember(models.Model):
 
 # Roster model
 class Roster(models.Model):
-    staff_member = models.ForeignKey(StaffMember, on_delete=models.CASCADE)
+    staff_member = models.OneToOneField(StaffMember, on_delete=models.CASCADE)
     # Example: "Monday, Wednesday, Friday"
     working_days = models.CharField(max_length=255)
     SHIFT_CHOICES = (

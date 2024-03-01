@@ -30,6 +30,7 @@
       <td>{{ roster.shifts }}</td>
       <td><a href="{% url 'roster_update_url' roster.id %}">Edit</a></td>
       <td><a href="{% url 'roster_delete_url' roster.id %}">Delete</a></td>
+      <td><a href="{% url 'roster_attendance_url' roster.id %}">Attendance</a></td>
     </tr>
     {% endfor %}
   </tbody>

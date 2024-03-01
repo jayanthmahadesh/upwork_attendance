@@ -146,13 +146,22 @@ def mark_attendance(request):
         form = AttendanceForm()
     return render(request, 'manager/mark_attendance.html')
 
-
+def roster_attendance_display(request,id):
+    access=check_user_access(request)
+    if(access):
+        return redirect('no_access')
+    roster = Roster.objects.get(id=id)
+    staff_member = roster.staff_member
+    attendance_records = AttendanceRecord.objects.filter(staff_member=staff_member)
+    print(attendance_records)
+    context = {
+        'attendance_records': attendance_records
+    }
+    return render(request, 'attendance.html', context) 
 
 
 def register_success_view(request):
     return render(request, 'success.html') 
-
-
 
 def no_access(request):
     return render(request, 'no_access.html') 
