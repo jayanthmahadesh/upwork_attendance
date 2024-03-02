@@ -12,7 +12,16 @@ from .forms import UserRegistrationForm, StaffMemberForm,RosterForm,LoginForm,At
 from .models import StaffMember,Roster,AttendanceRecord
 
 def homepage(request):
-    return render(request,'homepage.html')
+    access=check_user_access(request)
+    str=""
+    if(~access):
+        str="1"
+    else:
+        str="0"
+    context = {
+        'role': str
+    }
+    return render(request,'homepage.html',context)
 
 def register(request):
     # type_of_user = request.session.get('user_type')
@@ -78,7 +87,7 @@ def create_roster(request):
                 print("something unwanted happened")
                 return render(request, 'manager/roster_form.html', {'form': form, 'error_message': 'Staff member not found'})
             roster = form.save(commit=False)
-            roster.staff_member = staff_member
+            roster.staff_member=staff_member
             roster.save()
             return redirect('register_success')
     else:
@@ -86,13 +95,18 @@ def create_roster(request):
     temp = StaffMember.objects.filter()
     staff_list=[]
     for i in temp:
-        staff_list.append(i.user.username)
+        if(i.role=="Staff"):
+            staff_list.append(i.user.username)
     return render(request, 'manager/roster_form.html', {'form': form,'staff_list':staff_list})
 def roster_list(request):
     access=check_user_access(request)
-    if(access):
-        return redirect('no_access')
-    rosters = Roster.objects.all()
+    if(~access):
+        print("manager")
+        rosters = Roster.objects.all()
+    else:
+        username = request.session.get('user_name')
+        rosters = Roster.objects.filter(staff_member__user__username=username)
+    print(rosters)
     return render(request, 'manager/roster_list.html', {'rosters': rosters})
 
 
@@ -125,35 +139,45 @@ def roster_delete_view(request, id):
 @login_required
 def mark_attendance(request):
     if request.method == 'POST':
+
         image_data = request.POST.get('image_data')
+        selected_time = request.POST.get('selected_time')
+        parts = selected_time.split(":")
         # Decode base64 data
         format, imgstr = image_data.split(';base64,') 
         ext = format.split('/')[-1] 
         data = ContentFile(base64.b64decode(imgstr), name=uuid.uuid4().hex + '.' + ext)
-
         # Save to model
         image_instance = AttendanceRecord(image=data)
         staff_member_id = request.session.get('user_id')
         try:
             staff_member = StaffMember.objects.get(pk=staff_member_id)
         except StaffMember.DoesNotExist:
-            print("something unwanted happened")
             return render(request, 'login.html')
         image_instance.staff_member = staff_member
+        image_instance.role=parts[0]
+        image_instance.shift=parts[1]
         image_instance.save()
         return redirect('register_success')  # Redirect to a new URL
     else:
         form = AttendanceForm()
-    return render(request, 'manager/mark_attendance.html')
+    username = request.session.get('user_name')
+    rosters = Roster.objects.filter(staff_member__user__username=username)
+    temp=[]
+    for roster in rosters:
+        temp.append((roster.working_days,roster.shifts))
+    context = {
+        'roster_list': temp
+    }
+    return render(request, 'manager/mark_attendance.html',context)
 
-def roster_attendance_display(request,id):
+def roster_attendance_display(request,id,working_days,shift):
     access=check_user_access(request)
-    if(access):
-        return redirect('no_access')
+    # if(access):
+    #     return redirect('no_access')
     roster = Roster.objects.get(id=id)
     staff_member = roster.staff_member
     attendance_records = AttendanceRecord.objects.filter(staff_member=staff_member)
-    print(attendance_records)
     context = {
         'attendance_records': attendance_records
     }
@@ -169,6 +193,8 @@ def no_access(request):
 
 def check_user_access(request):
     type_of_user = request.session.get('user_type')
+    print(type_of_user)
     if(type_of_user=="Manager"):
+        
         return False
     return True

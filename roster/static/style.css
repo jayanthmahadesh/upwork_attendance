@@ -25,6 +25,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+
 }
 
 
@@ -89,3 +90,17 @@ table img {
     max-width: 100px; /* Limit image width inside the table cell */
     height: auto;     
   }
+
+
+.video_display{
+    display: flex;
+    flex-direction: column;
+}
+.video_box{
+    margin: 2vw;
+}
+.video_container{
+    display: flex;
+    flex-direction: row;
+}
+

@@ -15,7 +15,7 @@ urlpatterns = [
     path('create_roster/',create_roster,name='create_roster'),
     path('roster/<int:id>/edit/', roster_update_view, name='roster_update_url'),
     path('roster/<int:id>/delete/', roster_delete_view, name='roster_delete_url'),
-    path('roster/<int:id>/attendance/', roster_attendance_display, name='roster_attendance_url'),
+    path('roster/<int:id>/<str:working_days>/<str:shift>/attendance/', roster_attendance_display, name='roster_attendance_url'),
 
     # path('roaster/mark_attendance/', mark_attendance, name='mark_attendance'),
     path('mark_attendance/',mark_attendance,name="mark_attendance"),

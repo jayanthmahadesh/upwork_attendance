@@ -20,7 +20,7 @@ class StaffMember(models.Model):
 
 # Roster model
 class Roster(models.Model):
-    staff_member = models.OneToOneField(StaffMember, on_delete=models.CASCADE)
+    staff_member = models.OneToOneField(StaffMember ,on_delete=models.CASCADE)
     # Example: "Monday, Wednesday, Friday"
     working_days = models.CharField(max_length=255)
     SHIFT_CHOICES = (
@@ -32,17 +32,17 @@ class Roster(models.Model):
 
     def __str__(self):
         return f"{self.staff_member.user.username}'s Roster"
-
+    
 # AttendanceRecord model
 class AttendanceRecord(models.Model):
     staff_member = models.ForeignKey(StaffMember, on_delete=models.CASCADE)
     timestamp = models.DateTimeField(default=timezone.now)
     # Assuming media is configured
     image = models.ImageField(upload_to='images')
-
+    role = models.CharField(max_length=100)
+    shift = models.CharField(max_length=100)
     def __str__(self):
         return f"Attendance for {self.staff_member.user.username} on {self.timestamp.strftime('%Y-%m-%d %H:%M')}"
-
 
 # class AttendanceRecord(models.Model):
 #     staff_member = models.ForeignKey(User, on_delete=models.CASCADE)
