@@ -3,7 +3,7 @@
   <div class="container_one">
     {% if request.user.is_authenticated %}
     <a href="/logout">Logout</a>
-    {% if role == "0"%}
+    {% if role == "1"%}
     <a href="/mark_attendance">Mark your attendance</a>
     {%endif%}
     <a href="/roster_list">Roster List</a>

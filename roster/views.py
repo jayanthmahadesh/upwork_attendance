@@ -1,7 +1,5 @@
-# Create your views here.
-import base64
-import uuid  
 
+import base64,uuid
 from django.contrib.auth import authenticate, login,logout
 from django.contrib.auth.decorators import login_required
 from django.core.files.base import ContentFile
@@ -14,22 +12,16 @@ from .models import StaffMember,Roster,AttendanceRecord
 def homepage(request):
     access=check_user_access(request)
     str=""
-    if(~access):
+    if(access):
         str="1"
     else:
         str="0"
     context = {
         'role': str
     }
-    return render(request,'homepage.html')
+    return render(request,'homepage.html',context)
 
 def register(request):
-    # type_of_user = request.session.get('user_type')
-    # if(type_of_user=="Staff"):
-    #     return redirect('no_access')
-    # access=check_user_access(request)
-    # if(access):
-    #     return redirect('no_access')
     if request.method == 'POST':
         user_form = UserRegistrationForm(request.POST)
         member_form = StaffMemberForm(request.POST)
@@ -52,8 +44,6 @@ def custom_login(request):
         if user is not None:
             login(request, user)
             print("user is logged in")
-            # Redirect to a success page.
-            # will define this /success_url in couple of minutes
             staff_member = StaffMember.objects.get(user__username=username)
             print("the primary key of the object"+str(staff_member.pk))
             request.session['user_id'] = staff_member.pk
@@ -84,11 +74,13 @@ def create_roster(request):
                 staff_member = StaffMember.objects.get(user__username=username)
             except StaffMember.DoesNotExist:
                 # Handle the case where the staff member is not found
-                print("something unwanted happened")
                 return render(request, 'manager/roster_form.html', {'form': form, 'error_message': 'Staff member not found'})
             roster = form.save(commit=False)
             roster.staff_member=staff_member
-            roster.save()
+            try:
+                roster.save()
+            except:
+                return render(request, 'roster_exists.html')
             return redirect('register_success')
     else:
         form = RosterForm()
@@ -100,15 +92,12 @@ def create_roster(request):
     return render(request, 'manager/roster_form.html', {'form': form,'staff_list':staff_list})
 def roster_list(request):
     access=check_user_access(request)
-    if(~access):
-        print("manager")
-        rosters = Roster.objects.all()
-    else:
+    if(access):
         username = request.session.get('user_name')
         rosters = Roster.objects.filter(staff_member__user__username=username)
-    print(rosters)
+    else:
+        rosters = Roster.objects.all()
     return render(request, 'manager/roster_list.html', {'rosters': rosters})
-
 
 def roster_update_view(request, id):
     access=check_user_access(request)
@@ -136,6 +125,7 @@ def roster_delete_view(request, id):
         # Redirect to the roster listing page
         return redirect('roster_list_url')
     return render(request, 'manager/roster_confirm_delete.html', {'object': roster})
+
 @login_required
 def mark_attendance(request):
     if request.method == 'POST':
@@ -173,8 +163,6 @@ def mark_attendance(request):
 
 def roster_attendance_display(request,id,working_days,shift):
     access=check_user_access(request)
-    # if(access):
-    #     return redirect('no_access')
     roster = Roster.objects.get(id=id)
     staff_member = roster.staff_member
     attendance_records = AttendanceRecord.objects.filter(staff_member=staff_member)
@@ -193,8 +181,6 @@ def no_access(request):
 
 def check_user_access(request):
     type_of_user = request.session.get('user_type')
-    print(type_of_user)
     if(type_of_user=="Manager"):
-        
         return False
     return True
