@@ -21,7 +21,7 @@ def homepage(request):
     context = {
         'role': str
     }
-    return render(request,'homepage.html',context)
+    return render(request,'homepage.html')
 
 def register(request):
     # type_of_user = request.session.get('user_type')
